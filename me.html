@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Me</title>
+  <style>
+    :root {
+      --bg-color: #e6ccf2;
+      --box-color: #f3e5f5;
+      --button-color: #b799e3;
+      --pipe-color: purple;
+      --header-color: #b799e3; /* Default header color */
+      --song-title-color: #6a1b9a; /* Default song title color */
+    }
+
+    body.night-mode {
+      --bg-color: #cce6f9;
+      --box-color: #e0f7ff;
+      --button-color: #91c7ec;
+      --pipe-color: navy;
+      --header-color: #3b4e72; /* Night mode header color */
+      --song-title-color: #1d3557; /* Dark blue for song title in night mode */
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      background-color: var(--header-color);
+      width: 100%;
+      padding: 1em 0;
+      text-align: center;
+      color: white;
+    }
+    .about {
+      padding: 2em;
+      max-width: 1000px;
+      text-align: center;
+    }
+    .controls-box {
+      background-color: var(--box-color);
+      border-radius: 12px;
+      padding: 1em;
+      margin-bottom: 20px;
+    }
+    .video-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .video-controls button, #modeToggle {
+      background-color: var(--button-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .media-section {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    video {
+      width: 640px;
+      height: 360px;
+      border-radius: 10px;
+    }
+    canvas {
+      border: 2px solid #000;
+    }
+    #currentSongTitle {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      color: var(--song-title-color); /* Default song title color */
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>About me</h1>
+  </header>
+
+  <section class="about">
+    <p>This is the three most prominent parts of my life: games, drawing and music. I hope you enjoy.</p>
+
+    <div class="controls-box">
+      <div id="currentSongTitle"></div>
+      <div class="video-controls">
+        <button onclick="prevSong()">↻</button>
+        <button onclick="toggleMusicPlayPause()" id="musicPlayPauseBtn">▷</button>
+        <button onclick="nextSong()">↺</button>
+      </div>
+    </div>
+
+    <div class="media-section">
+      <video id="customVideo" autoplay loop muted>
+        <source id="videoSource" src="train.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+
+      <canvas id="gameCanvas" width="320" height="480"></canvas>
+    </div>
+
+    <button id="modeToggle" onclick="toggleMode()">🌅 Switch to Sunset Mode</button>
+  </section>
+
+  <script>
+    let isNight = false;
+    const musicPlaylists = {
+      day: [
+        { title: "G Sounds & kido. - Good Morning", src: 'G Sounds & kido. - Good Morning.mp3' },
+        { title: "Lo-fi Type Beat - Rain", src: '(FREE) Lo-fi Type Beat - Rain.mp3' },
+        { title: "RŮDE - Eternal Youth", src: 'RŮDE - Eternal Youth.mp3'},
+        { title: "Vindu - Lotus [Peace of Mind EP]", src: 'Vindu - Lotus [Peace of Mind EP] (japanese lo-fi).mp3' },
+        { title: "Aomori Snow - Vindu", src: 'Aomori Snow - Vindu.mp3'}
+      ],
+      night: [
+        { title: "Antonio Vivaldi - Four Seasons(Winter)", src: 'Antonio Vivaldi - Four Seasons (Winter - Best part).mp3'},
+        { title: "Aram Khachaturian - Masquerade Suite - Waltz", src: 'Aram Khachaturian - Masquerade Suite - Waltz.mp3' },
+        { title: "Mozart - Lacrimosa", src: 'Mozart - Lacrimosa.mp3'},
+        { title: "Tchaikovsky - Swan Lake (Swan Theme)", src: 'Tchaikovsky - Swan Lake (Swan Theme).mp3' },
+        { title: "Pyotr Ilyich Tchaikovsky  Dance of the Sugar Plum Fairy", src: 'Pyotr Ilyich Tchaikovsky  Dance of the Sugar Plum Fairy.mp3' }
+      ]
+    };
+
+    let currentPlaylist = musicPlaylists.day;
+    let currentSongIndex = 0;
+    const audio = new Audio(currentPlaylist[currentSongIndex].src);
+    const musicPlayPauseBtn = document.getElementById("musicPlayPauseBtn");
+    const currentSongTitle = document.getElementById("currentSongTitle");
+    currentSongTitle.textContent = currentPlaylist[currentSongIndex].title;
+
+    audio.addEventListener('ended', () => nextSong());
+
+    function toggleMusicPlayPause() {
+      if (audio.paused) {
+        audio.play().then(() => {
+          musicPlayPauseBtn.textContent = "||";
+        });
+      } else {
+        audio.pause();
+        musicPlayPauseBtn.textContent = "▷";
+      }
+    }
+
+    function nextSong() {
+      currentSongIndex = (currentSongIndex + 1) % currentPlaylist.length;
+      audio.src = currentPlaylist[currentSongIndex].src;
+      audio.play();
+      musicPlayPauseBtn.textContent = "||";
+      currentSongTitle.textContent = currentPlaylist[currentSongIndex].title;
+    }
+
+    function prevSong() {
+      currentSongIndex = (currentSongIndex - 1 + currentPlaylist.length) % currentPlaylist.length;
+      audio.src = currentPlaylist[currentSongIndex].src;
+      audio.play();
+      musicPlayPauseBtn.textContent = "||";
+      currentSongTitle.textContent = currentPlaylist[currentSongIndex].title;
+    }
+
+    function toggleMode() {
+      isNight = !isNight;
+      document.body.classList.toggle('night-mode');
+      document.getElementById("modeToggle").textContent = isNight ? "🌇 Switch to Sunrise Mode" : "🌅 Switch to Night Mode";
+
+      const videoElement = document.getElementById("customVideo");
+      const videoSource = document.getElementById("videoSource");
+      videoSource.src = isNight ? "trainsunset.mp4" : "train.mp4";
+      videoElement.load();
+      videoElement.play();
+      videoElement.loop = true;
+
+      currentPlaylist = isNight ? musicPlaylists.night : musicPlaylists.day;
+      currentSongIndex = 0;
+      audio.src = currentPlaylist[0].src;
+      currentSongTitle.textContent = currentPlaylist[0].title;
+      musicPlayPauseBtn.textContent = "▷";
+    }
+
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let frames = 0;
+    const birdImg = new Image();
+    birdImg.src = "smallbird.png";
+
+    const state = {
+      current: 0,
+      getReady: 0,
+      game: 1,
+      over: 2
+    };
+
+    document.addEventListener("keydown", function(evt) {
+      if (evt.code === "Space") {
+        switch(state.current) {
+          case state.getReady: state.current = state.game; break;
+          case state.game: bird.flap(); break;
+          case state.over:
+            pipes.reset(); bird.reset(); score.reset();
+            state.current = state.getReady;
+            break;
+        }
+      }
+    });
+
+    const bird = {
+      x: 50, y: 150, w: 34, h: 26,
+      gravity: 0.25, jump: 4.6, speed: 0,
+      draw() { ctx.drawImage(birdImg, this.x, this.y, this.w, this.h); },
+      flap() { this.speed = -this.jump; },
+      update() {
+        if (state.current === state.getReady) this.y = 150;
+        else {
+          this.speed += this.gravity;
+          this.y += this.speed;
+          if (this.y + this.h >= canvas.height) state.current = state.over;
+        }
+      },
+      reset() { this.speed = 0; this.y = 150; }
+    };
+
+    const pipes = {
+      position: [], width: 50, gap: 100, maxYPos: -150, dx: 2,
+      draw() {
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--pipe-color');
+        for (let p of this.position) {
+          ctx.fillRect(p.x, p.y, this.width, canvas.height);
+          ctx.fillRect(p.x, p.y + canvas.height + this.gap, this.width, canvas.height);
+        }
+      },
+      update() {
+        if (state.current !== state.game) return;
+        if (frames % 100 === 0) {
+          this.position.push({ x: canvas.width, y: this.maxYPos * (Math.random() + 1), passed: false });
+        }
+        for (let i = 0; i < this.position.length; i++) {
+          let p = this.position[i];
+          p.x -= this.dx;
+          if (!p.passed && p.x + this.width < bird.x) {
+            score.value++;
+            if (score.value > score.best) score.best = score.value;
+            p.passed = true;
+          }
+          if (bird.x + bird.w > p.x && bird.x < p.x + this.width &&
+              (bird.y < p.y + canvas.height || bird.y + bird.h > p.y + canvas.height + this.gap)) {
+            state.current = state.over;
+          }
+          if (p.x + this.width <= 0) this.position.shift();
+        }
+      },
+      reset() { this.position = []; }
+    };
+
+    const score = {
+      value: 0,
+      best: 0,
+      draw() {
+        ctx.fillStyle = "#000";
+        ctx.font = "20px Arial";
+        ctx.fillText(`Score: ${this.value}`, 10, 25);
+        ctx.fillText(`Best: ${this.best}`, 10, 50);
+      },
+      reset() { this.value = 0; }
+    };
+
+    function draw() {
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--box-color');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      bird.draw(); pipes.draw(); score.draw();
+    }
+    function update() { bird.update(); pipes.update(); }
+    function loop() { update(); draw(); frames++; requestAnimationFrame(loop); }
+    loop();
+  </script>
+</body>
+</html>
